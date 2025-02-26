@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /*	hsl(14, 54%, 19%)*/
+  :root {
+    --background: 0 0% 100%;
+    /*--foreground: 220 13% 10%;*/
+    /*primary textColor */
+    /*--foreground: 14, 54%, 19%;*/
+    --foreground: 0, 0%, 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 13% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 13% 10%;
+    --primary: 41, 51%, 74%;
+    --primary-foreground: 220 13% 10%;
+    --secondary: 0 100% 45%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 60 4.8% 95.9%;
+    /*secondary textColor */
+    /*--muted-foreground: 25 5.3% 44.7%;//gray*/
+    --muted-foreground: 14, 54%, 19%;
+    --accent: 0 100% 45%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 60 9.1% 97.8%;
+    --border: 20 5.9% 90%;
+    --input: 20 5.9% 90%;
+    /*inputFocusBorder*/
+    --ring: 41 51% 74%;
+    --focus-primary: 357, 100%, 45;
+    /*--tw-gradient-stops: black !important;*/
+  }
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-serif antialiased bg-background text-foreground relative min-h-screen;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='100' viewBox='0 0 300 100' fill='none'%3E%3Crect width='300' height='100' fill='white'/%3E%3Cline x1='0' y1='20' x2='300' y2='20' stroke='rgba(0,0,0,0.1)' stroke-width='1'/%3E%3Cline x1='0' y1='30' x2='300' y2='30' stroke='rgba(0,0,0,0.1)' stroke-width='1'/%3E%3Cline x1='0' y1='40' x2='300' y2='40' stroke='rgba(0,0,0,0.1)' stroke-width='1'/%3E%3Cline x1='0' y1='50' x2='300' y2='50' stroke='rgba(0,0,0,0.1)' stroke-width='1'/%3E%3Cline x1='0' y1='60' x2='300' y2='60' stroke='rgba(0,0,0,0.1)' stroke-width='1'/%3E%3Ctext x='10' y='50' font-size='48' fill='rgba(0,0,0,0.2)' font-family='serif' transform='rotate(-10,10,50)'%3E♪%3C/text%3E%3Ctext x='60' y='30' font-size='24' fill='rgba(0,0,0,0.2)' font-family='serif' transform='rotate(10,60,30)'%3E♫%3C/text%3E%3Ctext x='120' y='55' font-size='24' fill='rgba(0,0,0,0.2)' font-family='serif' transform='rotate(-10,120,55)'%3E♪%3C/text%3E%3Ctext x='180' y='25' font-size='24' fill='rgba(0,0,0,0.2)' font-family='serif' transform='rotate(10,180,25)'%3E♩%3C/text%3E%3Ctext x='240' y='45' font-size='24' fill='rgba(0,0,0,0.2)' font-family='serif' transform='rotate(-10,240,45)'%3E♫%3C/text%3E%3C/svg%3E");
+    background-size: 300px 100px;
+    background-repeat: repeat;
+
+  }
+
+
+  .card {
+    @apply bg-white shadow-lg rounded-lg border border-red-500/20;
+  }
+}
