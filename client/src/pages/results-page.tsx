@@ -1,7 +1,10 @@
 import { useWebSocket } from "@/hooks/use-websocket";
 import { VOTE_OPTIONS } from "@shared/schema";
-import { Music2, Music3, Music4, Guitar, Drum } from "lucide-react";
-
+import Drum from '../../public/assets/Drums2.png'
+import Guitar from '../../public/assets/Guitar2.png'
+import Music4 from '../../public/assets/Violin.png'
+import Music2 from '../../public/assets/Piano2.png'
+import Music3 from '../../public/assets/Saxaphone3.png'
 const ICONS = {
   Music4,
   Guitar,
@@ -11,63 +14,61 @@ const ICONS = {
 };
 
 export default function ResultsPage() {
-  const { voteCounts } = useWebSocket();
-  const totalVotes = Object.values(voteCounts).reduce((a, b) => a + b, 0);
-  return (
-    <div className="min-h-screen max-w-full p-4 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 flex justify-center items-center gap-1.5"
-         style={{
-           backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)), url(../../public/assets/MusicBg.jpg)",
-           backgroundSize: 'cover',
-           backgroundPosition: 'center',
-           backgroundRepeat: 'no-repeat'
-         }}
-    >
-      <div className="max-w-full mx-auto py-8">
-        {/*<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-80 items-center justify-items-center">*/}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-80 items-center justify-end">
-          {VOTE_OPTIONS.map((option) => {
-            const Icon = ICONS[option.icon as keyof typeof ICONS];
-            const voteCount = voteCounts[option.id] || 0;
-            const percentage = totalVotes ? (voteCount / totalVotes) * 100 : 0;
-            const maxScale = 2; // Максимальный размер увеличения
-            const minScale = 0.8; // Минимальный размер
+    const { voteCounts } = useWebSocket();
 
-            const scale = Math.max(
-                minScale,
-                Math.min(maxScale, minScale + Math.log(voteCount + 1) / Math.log(80) * (maxScale - minScale))
-            );
+    return (
+        <div
+            className="min-h-screen max-w-full p-4 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 flex justify-center items-center"
+            style={{
+                backgroundImage:
+                    "linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)), url(../../public/assets/MusicBg.jpg)",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+            }}
+        >
+            <div className="max-w-screen-2xl w-full mx-auto mt-16">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-40 items-start justify-between">
+                    {VOTE_OPTIONS.map((option) => {
+                        const Icon = ICONS[option.icon as keyof typeof ICONS];
+                        let voteCount = voteCounts[option.id] || 0;
 
-            return (
-              <div
-                key={option.id}
-                className="relative flex flex-col items-center transition-all p-4 w-full gap-20 "
-                style={{
-                  transform: `scale(${scale})`,
-                  zIndex: Math.floor(percentage),
-                }}
-              >
-                <Icon 
-                  className="w-20 h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 text-primary transition-all"
-                  style={{
-                    transform: `scale(${scale})`,
-                  }}
-                />
-                {/*<h3*/}
-                {/*  className="mt-4 text-xl md:text-2xl lg:text-3xl font-bold text-center transition-all"*/}
-                {/*  style={{*/}
-                {/*    fontSize: `${1.5 * (scale / 3)}rem`,*/}
-                {/*  }}*/}
-                {/*>*/}
-                {/*  {option.name}*/}
-                {/*</h3>*/}
-                <p className="mt-2 text-sm md:text-base text-muted-foreground text-center">
-                  Голосов: {voteCount}
-                </p>
-              </div>
-            );
-          })}
+                        // 🔹 Устанавливаем масштабы
+                        const minScale = 0.4; // Новый базовый размер (раньше было 0.8)
+                        const maxScale = 2.5; // Максимальный размер увеличен
+                        const scale = Math.max(
+                            minScale,
+                            Math.min(maxScale, minScale + Math.log(voteCount + 1) / Math.log(80) * (maxScale - minScale))
+                        );
+
+                        return (
+                            <div
+                                key={option.id}
+                                className="relative flex flex-col items-center transition-all w-full min-h-[300px] text-center"
+                            >
+                                <img
+                                    src={Icon}
+                                    className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain transition-transform duration-300"
+                                    style={{
+                                        transform: `scale(${scale})`,
+                                        marginBottom: `${scale * 4}rem`, // Динамический отступ
+                                    }}
+                                />
+                                <p className="mt-4 font-bold text-lg md:text-xl lg:text-lg text-pretty "
+                                >
+                                    {option.name}
+                                </p>
+                                {/*TODO fix name on short version*/}
+                                <p className="mt-2 text-sm md:text-base text-primary text-red-900"
+                                   style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)'}}
+                                >
+                                    Голосов: {voteCount}
+                                </p>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

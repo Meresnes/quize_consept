@@ -5,7 +5,12 @@ import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { VOTE_OPTIONS } from "@shared/schema";
 import { useLocation, useParams } from "wouter";
-import { Loader2, Music, Music2, Music3, Music4, Guitar, Drum } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import Drum from '../../public/assets/Drums2.png'
+import Guitar from '../../public/assets/Guitar2.png'
+import Music4 from '../../public/assets/Violin.png'
+import Music2 from '../../public/assets/Piano2.png'
+import Music3 from '../../public/assets/Saxaphone3.png'
 import { useState } from "react";
 
 const ICONS = {
@@ -55,33 +60,38 @@ export default function VotePage() {
   };
 
   return (
-      <div className="min-h-screen p-4 bg-gradient-to-br from-primary/2 via-primary/5 to-primary/2">
-    {/*<div className="min-h-screen p-4 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5">*/}
-      <div className="max-w-6xl mx-auto space-y-8 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-primary/2 via-primary/5 to-primary/2  "
+           style={{
+             background: "linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7))",
+           }}
+      >
+      <div className="max-w-6xl mx-auto space-y-8 py-8 m-4 p-8">
         <div className="text-center space-y-4 flex items-center justify-center flex-col">
           <Logo />
           <h1 className="text-3xl font-bold">Выберите хорошее дело</h1>
           <p className="text-muted-foreground">Вы можете выбрать сразу несколько</p>
         </div>
 
-        <div className="grid md:grid-rows-3 lg:grid-rows-5 gap-8 font-bold">
+        <div className="grid md:grid-rows-3 lg:grid-rows-4 gap-8 font-bold">
           {VOTE_OPTIONS.map((option) => {
             const Icon = ICONS[option.icon as keyof typeof ICONS];
             const isSelected = selectedOptions.includes(option.id);
 
             return (
-              <div
-                key={option.id}
-                className={`relative p-6 gap-4 h-max flex flex-row items-center cursor-pointer transition-all hover:scale-105 ${
-                  isSelected ? 'ring-2 ring-primary rounded-lg' : ''
-                }`}
-                onClick={() => toggleOption(option.id)}
-              >
-                <Icon className="h-16 w-16 md:h-20 md:w-20 flex-shrink-0 min-w-[64px] md:min-w-[80px] transition-colors
-                ${isSelected ? 'text-primary' : 'text-muted-foreground'}" />
+                <div
+                    key={option.id}
+                    className={`relative p-6 gap-4 h-max flex flex-row items-center cursor-pointer transition-all ${
+                        isSelected ? 'scale-105 ring-2 ring-primary rounded-lg' : ''
+                    }`}
+                    onClick={() => toggleOption(option.id)}
+                >
+                  <img
+                      src={Icon}
+                      className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-lg"
+                  />
 
-                <h2 className="mt-4 text-lg md:text-xl text-left">{option.name}</h2>
-              </div>
+                  <h2 className="mt-4 text-lg md:text-xl text-left">{option.name}</h2>
+                </div>
             );
           })}
         </div>

@@ -10,7 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useLocation } from "wouter";
 import { InsertUser, insertUserSchema } from "@shared/schema";
-import { Loader2, Music2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
   const { toast } = useToast();
@@ -42,13 +42,15 @@ export default function RegisterPage() {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5"
+         style={{
+           background: "linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7))",
+         }}>
       <Card className="w-full max-w-md mx-4 border-primary shadow-xl">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
             <Logo />
           </div>
-          {/*<CardTitle className="text-2xl text-center font-bold">Твоя нота </CardTitle>*/}
           <p className="text-center text-sm text-muted-foreground">Пожайлуста заполните поля, чтобы продолжить</p>
         </CardHeader>
         <CardContent>

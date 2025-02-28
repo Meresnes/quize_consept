@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { REPLIT_URL } from "@/lib/constants";
 
 export function useWebSocket() {
   const [voteCounts, setVoteCounts] = useState<Record<number, number>>({});
