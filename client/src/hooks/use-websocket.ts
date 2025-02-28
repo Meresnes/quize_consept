@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import {VoteCountWithUsers} from "../../../server/storage";
 
 export function useWebSocket() {
-  const [voteCounts, setVoteCounts] = useState<Record<number, number>>({});
+  const [voteCounts, setVoteCounts] = useState<VoteCountWithUsers>({});
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {

@@ -13,7 +13,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Broadcast vote counts to all connected clients
   async function broadcastVoteCounts() {
     const counts = await storage.getVoteCount();
-    const message = JSON.stringify({ type: "voteCounts", data: counts });
+    const message = JSON.stringify({type: "voteCounts", data: counts});
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(message);

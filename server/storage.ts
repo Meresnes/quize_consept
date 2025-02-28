@@ -25,12 +25,17 @@ db.exec(`
   );
 `);
 
+export type VoteCountWithUsers = Record<
+    number,
+    { count: number; voters: User[] }
+>;
+
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getAllUsers(): Promise<User[]>;
   createVote(vote: InsertVote): Promise<Vote>;
-  getVoteCount(): Promise<Record<number, number>>;
+  getVoteCount(): Promise<VoteCountWithUsers>;
   markUserVoted(userId: number): Promise<void>;
   sessionStore: session.Store;
 }
@@ -78,14 +83,24 @@ export class SQLiteStorage implements IStorage {
     }
   }
 
-  async getVoteCount(): Promise<Record<number, number>> {
-    const votes = db.prepare("SELECT optionIds FROM votes").all();
-    const counts: Record<number, number> = {};
+  async getVoteCount(): Promise<VoteCountWithUsers> {
+    const votes = db.prepare("SELECT v.optionIds, u.id AS userId, u.fullName, u.phone FROM votes v JOIN users u ON v.userId = u.id").all();
+    const counts: VoteCountWithUsers = {};
+
     for (const vote of votes) {
       try {
         const optionIds = JSON.parse(vote.optionIds);
+        const user = { id: vote.userId, fullName: vote.fullName, phone: vote.phone, hasVoted: true }; // Создаем объект пользователя
         for (const id of optionIds) {
-          counts[id] = (counts[id] || 0) + 1;
+          if (!counts[id]) {
+            counts[id] = { count: 0, voters: [] };
+          }
+          counts[id].count++;
+          //проверяем есть ли уже пользователь в массиве, чтобы не дублировать
+          if (!counts[id].voters.some(voter => voter.id === user.id)) {
+            counts[id].voters.push(user);
+          }
+
         }
       } catch (error) {
         console.error("Error parsing vote:", error);
