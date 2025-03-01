@@ -5,12 +5,12 @@ import { storage } from "./storage";
 import { insertUserSchema, insertVoteSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
+import {STATUS} from "@/types/status";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ server: httpServer, path: "/ws" });
 
-  // Broadcast vote counts to all connected clients
   async function broadcastVoteCounts() {
     const counts = await storage.getVoteCount();
     const message = JSON.stringify({type: "voteCounts", data: counts});
@@ -23,6 +23,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/register", async (req, res) => {
     try {
+      const currentStatus = await storage.getRegistrationStatus();
+      if (currentStatus === STATUS.CLOSED) {
+        return res.status(403).json({ error: "Регистрация закрыта" });
+      }
       const userData = insertUserSchema.parse(req.body);
       const user = await storage.createUser(userData);
       res.status(201).json(user);
@@ -35,6 +39,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+
+  app.get("/api/registration-status", async (req, res) => {
+    try {
+      const status = await storage.getRegistrationStatus();
+      res.status(200).json({ status });
+    } catch (error) {
+      res.status(500).json({ error: "Ошибка сервера" });
+    }
+  });
+
+  app.post("/api/registration-status", async (req, res) => {
+    try {
+      const { status } = req.body;
+
+      if (status !== STATUS.OPEN && status !== STATUS.CLOSED) {
+        console.error("Ошибка: Неправильный статус", status);
+        return res.status(400).json({ error: "Неправильный статус" });
+      }
+
+      await storage.setRegistrationStatus(status);
+      res.status(200).json({ status });
+    } catch (error) {
+      console.error("Ошибка при обновлении статуса регистрации:", error);
+      res.status(500).json({ error: error.message || "Ошибка сервера" });
+    }
+  });
+
+  app.post("/api/vote", async (req, res) => {
+    try {
+      const voteData = insertVoteSchema.parse(req.body);
+      const user = await storage.getUser(voteData.userId);
+
+      if (!user) {
+        return res.status(404).json({ error: "Пользователь не найден" });
+      }
+
+      if (user.hasVoted) {
+        return res.status(400).json({ error: "Вы уже выбрали вариант ответа" });
+      }
+
+      await storage.createVote(voteData);
+      await storage.markUserVoted(voteData.userId);
+      await broadcastVoteCounts();
+
+      res.status(201).json({ success: true });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: fromZodError(error).message });
+      } else {
+        res.status(500).json({ error: "Ошибка сервера" });
+      }
+    }
+  });
+
+  // Broadcast initial vote counts when clients connect
   app.post("/api/vote", async (req, res) => {
     try {
       const voteData = insertVoteSchema.parse(req.body);

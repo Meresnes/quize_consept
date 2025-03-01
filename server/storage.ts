@@ -3,6 +3,7 @@ import { User, Vote, InsertUser, InsertVote } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 import path from "path";
+import {STATUS} from "@/types/status";
 
 const MemoryStore = createMemoryStore(session);
 const DB_PATH = path.join(process.cwd(), "storage.db");
@@ -23,6 +24,12 @@ db.exec(`
    userId INTEGER NOT NULL,
    optionIds TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS registration_status (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  status TEXT NOT NULL DEFAULT 'OPEN' CHECK(status IN ('OPEN', 'CLOSED'))
+    );
+  INSERT INTO registration_status (status) SELECT 'OPEN' WHERE NOT EXISTS (SELECT 1 FROM registration_status);
 `);
 
 export type VoteCountWithUsers = Record<
@@ -38,6 +45,8 @@ export interface IStorage {
   getVoteCount(): Promise<VoteCountWithUsers>;
   markUserVoted(userId: number): Promise<void>;
   sessionStore: session.Store;
+  getRegistrationStatus(): Promise<STATUS>;
+  setRegistrationStatus(status: STATUS): Promise<void>;
 }
 
 export class SQLiteStorage implements IStorage {
@@ -90,17 +99,15 @@ export class SQLiteStorage implements IStorage {
     for (const vote of votes) {
       try {
         const optionIds = JSON.parse(vote.optionIds);
-        const user = { id: vote.userId, fullName: vote.fullName, phone: vote.phone, hasVoted: true }; // Создаем объект пользователя
+        const user = { id: vote.userId, fullName: vote.fullName, phone: vote.phone, hasVoted: true };
         for (const id of optionIds) {
           if (!counts[id]) {
             counts[id] = { count: 0, voters: [] };
           }
           counts[id].count++;
-          //проверяем есть ли уже пользователь в массиве, чтобы не дублировать
           if (!counts[id].voters.some(voter => voter.id === user.id)) {
             counts[id].voters.push(user);
           }
-
         }
       } catch (error) {
         console.error("Error parsing vote:", error);
@@ -114,6 +121,29 @@ export class SQLiteStorage implements IStorage {
       db.prepare("UPDATE users SET hasVoted = 1 WHERE id = ?").run(userId);
     } catch (error) {
       console.error("Error marking user as voted:", error);
+    }
+  }
+
+  async getRegistrationStatus(): Promise<STATUS> {
+    try {
+      const result = db.prepare("SELECT status FROM registration_status LIMIT 1").get() as { status: STATUS } | undefined;
+      if (!result) {
+        throw new Error("Registration status not found");
+      }
+      return result.status;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async setRegistrationStatus(status: STATUS): Promise<void> {
+    try {
+      const result = db.prepare("UPDATE registration_status SET status = ?").run(status);
+      if (result.changes === 0) {
+        throw new Error(`Failed to update registration status to ${status}`);
+      }
+    } catch (error) {
+      throw error;
     }
   }
 }

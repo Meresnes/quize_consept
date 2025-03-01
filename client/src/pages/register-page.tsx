@@ -1,16 +1,17 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useLocation } from "wouter";
 import { InsertUser, insertUserSchema } from "@shared/schema";
 import { Loader2 } from "lucide-react";
+import {STATUS} from "@/types/status";
 
 export default function RegisterPage() {
     const { toast } = useToast();
@@ -24,6 +25,15 @@ export default function RegisterPage() {
         },
     });
 
+    const { data: appStatus = STATUS.OPEN } = useQuery({
+        queryKey: ["/api/registration-status"],
+        queryFn: async () => {
+            const res = await apiRequest("GET", "/api/registration-status");
+            const data = await res.json();
+            return data.status;
+        },
+    });
+
     const mutation = useMutation({
         mutationFn: async (data: InsertUser) => {
             const res = await apiRequest("POST", "/api/register", data);
@@ -34,7 +44,7 @@ export default function RegisterPage() {
         },
         onError: (error: Error) => {
             toast({
-                title: "Registration failed",
+                title: "Ошибка регшистрации",
                 description: error.message,
                 variant: "destructive",
             });
@@ -47,16 +57,15 @@ export default function RegisterPage() {
                  background: "linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7))",
              }}
         >
-            <Card className="w-full md:max-w-md sm:border-primary max-sm:border-b-primary max-sm:border-t-primary max-sm:rounded-none shadow-xl h-[70vh] flex justify-center flex-col"
-
-            >
+            <Card className="w-full md:max-w-md sm:border-primary max-sm:border-b-primary max-sm:border-t-primary max-sm:rounded-none shadow-xl h-[70vh] flex justify-center flex-col">
                 <CardHeader className="space-y-1">
                     <div className="flex items-center justify-center mb-4 h-auto">
                         <Logo height={140}/>
                     </div>
-                    <p className="text-center text-sm text-muted-foreground">Пожайлуста заполните поля, чтобы продолжить</p>
+                    {appStatus === STATUS.OPEN && (<p className="text-center text-sm text-muted-foreground">Пожайлуста заполните поля, чтобы продолжить</p>)}
                 </CardHeader>
                 <CardContent>
+                    {appStatus === STATUS.OPEN ? (
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit((data) => mutation.mutate(data))} className="space-y-4">
                             <FormField
@@ -97,6 +106,14 @@ export default function RegisterPage() {
                             </Button>
                         </form>
                     </Form>
+                        ): (
+                        <div className="text-center">
+                            <h1 className="text-3xl font-bold text-red-700">Регистрация закрыта</h1>
+                            <br/>
+                            <h1 className="text-2xl font-bold text-red-700">Пожайлуста дождитесь начала мероприятия</h1>
+                        </div>
+                    )
+                    }
                 </CardContent>
             </Card>
         </div>
