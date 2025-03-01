@@ -33,72 +33,55 @@ export default function ResultsPage() {
 
     return (
         <div
-            className="min-h-screen max-w-full p-4 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 flex justify-center items-center"
+            className="min-h-screen max-w-full bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 flex justify-center items-center overflow-hidden"
             style={{
-                backgroundImage:
-                    "linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)), url(../../public/assets/MusicBg.jpg)",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
+                background: "linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7))",
             }}
         >
-            <div className="max-w-screen-2xl w-full mx-auto mt-16">
-                <div className="grid gap-y-20 gap-x-40 md:gap-x-60 grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
-                     style={{
-                         gridTemplateRows: "repeat(auto-fit, minmax(300px, 1fr))",
-                     }}
-                >
+            <div className="max-w-full w-full h-full">
+                <div className="flex flex-row min-h-screen w-full py-40">
                     {VOTE_OPTIONS.map((option, index) => {
                         const Icon = ICONS[option.icon as keyof typeof ICONS];
                         const voteData: VoteData = voteCounts[option.id] || { count: 0, voters: [] };
-                        const count = voteData.count
+                        let count = voteData.count;
+                        // if (index === 2 || index === 4 || index === 3 || index === 1 || index === 0) {
+                        //     count = 120
+                        // }
 
-                        const minScale = 0.4;
-                        const maxScale = 2.5;
-                        const scale = Math.max(
-                            minScale,
-                            Math.min(maxScale, minScale + Math.log(count + 1) / Math.log(80) * (maxScale - minScale))
-                        );
+                        const minScale = 1;
+                        const maxScale = 2.2;
+                        const maxVotes = 80;
+                        const scale = minScale + (maxScale - minScale) * Math.min(count / maxVotes, 1);
 
-                        // Определяем, на какой линии (четной или нечетной) находится элемент
-                        const isEvenRow = Math.floor(index / 2) % 2 === 0;
-                        const isFirstRow = index < 2;
+                        const isEven = index % 2 === 0;
 
                         return (
                             <div
                                 key={option.id}
-                                className={`relative flex flex-col items-center transition-all w-full min-h-[300px] text-center ${isFirstRow ? "" : isEvenRow ? "justify-self-end self-end" : "justify-self-start self-end"} `}
+                                className={`relative flex flex-col items-center transition-all w-full text-center ${
+                                    isEven ? "self-start" : "self-end"
+                                }`}
                                 style={{
-                                    gridRow: `span 1`, // Занимает 1 строку
-                                    gridColumn: `span 1`,
+                                    minHeight: "300px",
+                                    paddingBottom: "5rem",
                                 }}
                             >
-                                {option.id === 3 ? (
-                                    <img
-                                        src={Icon}
-                                        className="w-15 h-15 object-contain transition-transform duration-300"
-                                        style={{
-                                            transform: `scale(${scale / 1.5})`,
-                                            marginBottom: `${scale * 4}rem`,
-                                        }}
-                                    />
-                                ) : (
-                                    <img
-                                        src={Icon}
-                                        className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain transition-transform duration-300"
-                                        style={{
-                                            transform: `scale(${scale})`,
-                                            marginBottom: `${scale * 4}rem`,
-                                        }}
-                                    />
-                                )}
+                                <img
+                                    src={Icon}
+                                    className="object-contain transition-transform duration-300"
+                                    style={{
+                                        transform: `scale(${scale})`,
+                                        maxHeight: "200px",
+                                        marginBottom: `${scale * 52}px`,
+                                    }}
+                                />
 
                                 <p className="mt-4 font-bold text-lg md:text-xl lg:text-lg text-pretty">
-                                    {VOTE_SHORT_TEXT[option.id-1].name}
+                                    {VOTE_SHORT_TEXT[option.id - 1].name}
                                 </p>
                                 <p
                                     className="mt-2 text-sm md:text-base text-primary text-red-900"
-                                    style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)' }}
+                                    style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)" }}
                                 >
                                     Голосов: {count}
                                 </p>
