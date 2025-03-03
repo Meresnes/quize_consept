@@ -1,10 +1,10 @@
 import { useWebSocket } from "@/hooks/use-websocket";
 import { VOTE_OPTIONS, type User } from "@shared/schema";
-import Drum from '../../public/assets/Drums2.png'
-import Guitar from '../../public/assets/Guitar2.png'
+import Drum from '../../public/assets/Drums.png'
+import Guitar from '../../public/assets/Guitar.png'
 import Music4 from '../../public/assets/Violin.png'
-import Music2 from '../../public/assets/Piano2.png'
-import Music3 from '../../public/assets/Saxaphone3.png'
+import Music2 from '../../public/assets/Piano.png'
+import Music3 from '../../public/assets/Saxaphone.png'
 
 const ICONS = {
     Music4,

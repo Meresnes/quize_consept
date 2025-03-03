@@ -6,11 +6,11 @@ import { useMutation } from "@tanstack/react-query";
 import { VOTE_OPTIONS } from "@shared/schema";
 import { useLocation, useParams } from "wouter";
 import { Loader2 } from "lucide-react";
-import Drum from '../../public/assets/Drums2.png'
-import Guitar from '../../public/assets/Guitar2.png'
+import Drum from '../../public/assets/Drums.png'
+import Guitar from '../../public/assets/Guitar.png'
 import Music4 from '../../public/assets/Violin.png'
-import Music2 from '../../public/assets/Piano2.png'
-import Music3 from '../../public/assets/Saxaphone3.png'
+import Music2 from '../../public/assets/Piano.png'
+import Music3 from '../../public/assets/Saxaphone.png'
 import { useState } from "react";
 
 const ICONS = {
