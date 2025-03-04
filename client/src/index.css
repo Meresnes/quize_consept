@@ -68,6 +68,6 @@
   }
 
   .animate-fly {
-    animation: fly 7s ease-in-out forwards;
+    animation: fly 14s ease-in-out forwards;
   }
 }

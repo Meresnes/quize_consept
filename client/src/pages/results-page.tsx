@@ -70,7 +70,7 @@ export default function ResultsPage() {
 
                 setTimeout(() => {
                     setClouds(prev => prev.filter(cloud => cloud.id !== cloudId));
-                }, 6000);
+                }, 8000);
             });
         });
     }, [voteCounts]);
