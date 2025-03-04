@@ -1,6 +1,6 @@
 import { useWebSocket } from "@/hooks/use-websocket";
 import { VOTE_OPTIONS, type User } from "@shared/schema";
-import Drum from '../../public/assets/Drums.png';
+import Drum from '../../public/assets/Drum.png';
 import Guitar from '../../public/assets/Guitar.png';
 import Music4 from '../../public/assets/Violin.png';
 import Music2 from '../../public/assets/Piano.png';
@@ -23,8 +23,8 @@ type VoteData = {
 type Cloud = {
     id: number;
     username: string;
-    x: number; // Фиксированная координата X
-    y: number; // Фиксированная координата Y
+    x: number;
+    y: number;
     voteId: number;
 };
 
