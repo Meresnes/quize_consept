@@ -109,8 +109,6 @@ export default function RegisterPage() {
                         ): (
                         <div className="text-center">
                             <h1 className="text-3xl font-bold text-red-700">Регистрация закрыта</h1>
-                            <br/>
-                            <h1 className="text-2xl font-bold text-red-700">Пожайлуста дождитесь начала мероприятия</h1>
                         </div>
                     )
                     }

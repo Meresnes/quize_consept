@@ -49,4 +49,25 @@
   .card {
     @apply bg-white shadow-lg rounded-lg border border-red-500/20;
   }
+
+  @keyframes fly {
+    0% {
+      opacity: 0;
+      transform: translateX(-50%) translateY(0);
+    }
+    20% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-2400px);
+    }
+  }
+
+  .animate-fly {
+    animation: fly 7s ease-in-out forwards;
+  }
 }

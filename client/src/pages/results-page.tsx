@@ -5,6 +5,7 @@ import Guitar from '../../public/assets/Guitar.png'
 import Music4 from '../../public/assets/Violin.png'
 import Music2 from '../../public/assets/Piano.png'
 import Music3 from '../../public/assets/Saxaphone.png'
+import { useState, useEffect, useRef } from 'react';
 
 const ICONS = {
     Music4,
@@ -14,45 +15,84 @@ const ICONS = {
     Drum
 };
 
-// Добавим тип для данных о голосах, чтобы было проще работать
 type VoteData = {
     count: number;
     voters: User[];
 };
 
+type Cloud = {
+    id: number;
+    username: string;
+    x: number;
+    voteId: number;
+};
+
 const VOTE_SHORT_TEXT = [
-{ id: 1, name: "ХАСИДСКИЙ НИГУН" },
-{ id: 2, name: "БЛАГОДАРНОСТЬ" },
-{ id: 3, name: "ТЕИЛИМ"},
-{ id: 4, name: "ЗАПОВЕДИ ПУРИМА"},
-{ id: 5, name: "ШАББАТ" },
-]
+    { id: 1, name: "ХАСИДСКИЙ НИГУН" },
+    { id: 2, name: "БЛАГОДАРНОСТЬ" },
+    { id: 3, name: "ТЕИЛИМ"},
+    { id: 4, name: "ЗАПОВЕДИ ПУРИМА"},
+    { id: 5, name: "ШАББАТ" },
+];
 
 export default function ResultsPage() {
     const { voteCounts } = useWebSocket();
+    const [clouds, setClouds] = useState<Cloud[]>([]);
+    const prevVotersRef = useRef<Map<number, Set<string>>>(new Map()); // Хранит предыдущих голосовавших для каждого voteId
+
+    useEffect(() => {
+        const newVoters = new Map<number, User[]>();
+
+        Object.entries(voteCounts).forEach(([voteIdStr, data]: [string, VoteData]) => {
+            const voteId = parseInt(voteIdStr);
+            const prevVoters = prevVotersRef.current.get(voteId) || new Set();
+            const currentVoters = new Set(data.voters.map(voter => voter.fullName));
+            const newVoterNames = [...Array.from(currentVoters)].filter(name => !prevVoters.has(name));
+            const newVoterObjects = data.voters.filter(voter => newVoterNames.includes(voter.fullName));
+
+            if (newVoterObjects.length > 0) {
+                newVoters.set(voteId, newVoterObjects);
+            }
+
+            prevVotersRef.current.set(voteId, currentVoters);
+        });
+
+        // Создаем облака только для новых голосовавших
+        newVoters.forEach((voters, voteId) => {
+            voters.forEach(voter => {
+                const cloudId = Date.now() + Math.random(); // Более уникальный ID
+                setClouds(prev => [...prev, {
+                    id: cloudId,
+                    username: voter.fullName,
+                    x: Math.random() * 80,
+                    voteId
+                }]);
+
+                setTimeout(() => {
+                    setClouds(prev => prev.filter(cloud => cloud.id !== cloudId));
+                }, 6000);
+            });
+        });
+    }, [voteCounts]);
 
     return (
         <div
-            className="min-h-screen max-w-full bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 flex justify-center items-center overflow-hidden"
+            className="min-h-screen max-w-full bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 flex justify-center items-center overflow-hidden relative"
             style={{
                 background: "linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7))",
             }}
         >
             <div className="max-w-full w-full h-full">
-                <div className="flex flex-row min-h-screen w-full py-40">
+                <div className="flex flex-row min-h-screen w-full py-40 relative">
                     {VOTE_OPTIONS.map((option, index) => {
                         const Icon = ICONS[option.icon as keyof typeof ICONS];
                         const voteData: VoteData = voteCounts[option.id] || { count: 0, voters: [] };
                         let count = voteData.count;
-                        // if (index === 2 || index === 4 || index === 3 || index === 1 || index === 0) {
-                        //     count = 120
-                        // }
 
                         const minScale = 1;
                         const maxScale = 2.2;
                         const maxVotes = 80;
                         const scale = minScale + (maxScale - minScale) * Math.min(count / maxVotes, 1);
-
                         const isEven = index % 2 === 0;
 
                         return (
@@ -75,7 +115,6 @@ export default function ResultsPage() {
                                         marginBottom: `${scale * 52}px`,
                                     }}
                                 />
-
                                 <p className="mt-4 font-bold text-lg md:text-xl lg:text-lg text-pretty">
                                     {VOTE_SHORT_TEXT[option.id - 1].name}
                                 </p>
@@ -87,6 +126,30 @@ export default function ResultsPage() {
                                 </p>
                             </div>
                         );
+                    })}
+
+                    {clouds.map(cloud => {
+                        return (
+                        <div
+                            key={cloud.id}
+                            className="absolute animate-fly flex justify-center items-center border border-gray-200"
+                            style={{
+                                left: `${Math.random() * 80 + 5}%`,
+                                top: `${Math.random() * 60 + 20}%`,
+                                transform: 'translateX(-50%)',
+                                background: 'rgba(255, 255, 255, 0.9)',
+                                padding: '12px 24px',
+                                borderRadius: '25px',
+                                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
+                                fontSize: '1.1rem',
+                                minWidth: '120px',
+                            }}
+                        >
+                            <div className="text-lg font-medium text-primary">
+                                {cloud.username}
+                            </div>
+                        </div>
+                        )
                     })}
                 </div>
             </div>
