@@ -1,10 +1,10 @@
 import { useWebSocket } from "@/hooks/use-websocket";
 import { VOTE_OPTIONS, type User } from "@shared/schema";
-import Drum from '../../public/assets/Drums.png'
-import Guitar from '../../public/assets/Guitar.png'
-import Music4 from '../../public/assets/Violin.png'
-import Music2 from '../../public/assets/Piano.png'
-import Music3 from '../../public/assets/Saxaphone.png'
+import Drum from '../../public/assets/Drums.png';
+import Guitar from '../../public/assets/Guitar.png';
+import Music4 from '../../public/assets/Violin.png';
+import Music2 from '../../public/assets/Piano.png';
+import Music3 from '../../public/assets/Saxaphone.png';
 import { useState, useEffect, useRef } from 'react';
 
 const ICONS = {
@@ -23,22 +23,23 @@ type VoteData = {
 type Cloud = {
     id: number;
     username: string;
-    x: number;
+    x: number; // Фиксированная координата X
+    y: number; // Фиксированная координата Y
     voteId: number;
 };
 
 const VOTE_SHORT_TEXT = [
     { id: 1, name: "ХАСИДСКИЙ НИГУН" },
     { id: 2, name: "БЛАГОДАРНОСТЬ" },
-    { id: 3, name: "ТЕИЛИМ"},
-    { id: 4, name: "ЗАПОВЕДИ ПУРИМА"},
+    { id: 3, name: "ТЕИЛИМ" },
+    { id: 4, name: "ЗАПОВЕДИ ПУРИМА" },
     { id: 5, name: "ШАББАТ" },
 ];
 
 export default function ResultsPage() {
     const { voteCounts } = useWebSocket();
     const [clouds, setClouds] = useState<Cloud[]>([]);
-    const prevVotersRef = useRef<Map<number, Set<string>>>(new Map()); // Хранит предыдущих голосовавших для каждого voteId
+    const prevVotersRef = useRef<Map<number, Set<string>>>(new Map());
 
     useEffect(() => {
         const newVoters = new Map<number, User[]>();
@@ -57,14 +58,14 @@ export default function ResultsPage() {
             prevVotersRef.current.set(voteId, currentVoters);
         });
 
-        // Создаем облака только для новых голосовавших
         newVoters.forEach((voters, voteId) => {
             voters.forEach(voter => {
-                const cloudId = Date.now() + Math.random(); // Более уникальный ID
+                const cloudId = Date.now() + Math.random();
                 setClouds(prev => [...prev, {
                     id: cloudId,
                     username: voter.fullName,
-                    x: Math.random() * 80,
+                    x: Math.random() * 80 + 5, // Фиксируем x
+                    y: Math.random() * 60 + 20, // Фиксируем y
                     voteId
                 }]);
 
@@ -128,14 +129,13 @@ export default function ResultsPage() {
                         );
                     })}
 
-                    {clouds.map(cloud => {
-                        return (
+                    {clouds.map(cloud => (
                         <div
                             key={cloud.id}
                             className="absolute animate-fly flex justify-center items-center border border-gray-200"
                             style={{
-                                left: `${Math.random() * 80 + 5}%`,
-                                top: `${Math.random() * 60 + 20}%`,
+                                left: `${cloud.x}%`, // Фиксированная позиция X
+                                top: `${cloud.y}%`, // Фиксированная позиция Y
                                 transform: 'translateX(-50%)',
                                 background: 'rgba(255, 255, 255, 0.9)',
                                 padding: '12px 24px',
@@ -149,8 +149,7 @@ export default function ResultsPage() {
                                 {cloud.username}
                             </div>
                         </div>
-                        )
-                    })}
+                    ))}
                 </div>
             </div>
         </div>
