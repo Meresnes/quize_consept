@@ -99,7 +99,7 @@ export default function AdminPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Зарегестрированные пользователи</CardTitle>
+            <CardTitle>Зарегистрированные пользователи</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>

@@ -62,7 +62,7 @@ export default function RegisterPage() {
                     <div className="flex items-center justify-center mb-4 h-auto">
                         <Logo height={140}/>
                     </div>
-                    {appStatus === STATUS.OPEN && (<p className="text-center text-sm text-muted-foreground">Пожайлуста заполните поля, чтобы продолжить</p>)}
+                    {appStatus === STATUS.OPEN && (<p className="text-center text-sm text-muted-foreground">Пожайлуста, заполните поля, чтобы продолжить</p>)}
                 </CardHeader>
                 <CardContent>
                     {appStatus === STATUS.OPEN ? (

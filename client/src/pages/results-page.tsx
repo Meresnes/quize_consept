@@ -28,7 +28,7 @@ type Cloud = {
     voteId: number;
 };
 
-const VOTE_SHORT_TEXT = [
+export const VOTE_SHORT_TEXT = [
     { id: 1, name: "БЛАГОДАРНОСТЬ" },
     { id: 2, name: "ТЕИЛИМ" },
     { id: 3, name: "ЗАПОВЕДИ ПУРИМА" },
