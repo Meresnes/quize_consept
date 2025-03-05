@@ -25,13 +25,13 @@ export default function VotePage() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const params = useParams<{ id: string }>();
-  const [selectedOption, setSelectedOption] = useState<number | null>(null); // Изменено: теперь храним ID одного выбранного варианта
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
 
   const mutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/vote", {
         userId: parseInt(params.id!),
-        optionIds: [selectedOption], // Изменено: отправляем массив с одним ID
+        optionIds: [selectedOption],
       });
       return res.json();
     },
@@ -44,7 +44,7 @@ export default function VotePage() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Ошибка голосования", // исправлено
+        title: "Ошибка голосования",
         description: error.message,
         variant: "destructive",
       });
@@ -52,7 +52,7 @@ export default function VotePage() {
   });
 
   const handleOptionClick = (optionId: number) => {
-    setSelectedOption(optionId); // Изменено: теперь устанавливаем выбранный ID
+    setSelectedOption(optionId);
   };
 
   return (
@@ -64,14 +64,14 @@ export default function VotePage() {
         <div className="max-w-6xl mx-auto space-y-8 py-8 m-4 p-8">
           <div className="text-center space-y-4 flex items-center justify-center flex-col">
             <Logo />
-            <h1 className="text-3xl font-bold">Выберите хорошее дело</h1>
-            <p className="text-muted-foreground">Вы можете выбрать только один вариант</p> {/* изменено */}
+            <h1 className="text-3xl font-bold">Выберите хорошее решение</h1>
+            <p className="text-muted-foreground">Вы можете выбрать только один вариант</p>
           </div>
 
           <div className="grid md:grid-rows-3 lg:grid-rows-4 gap-8 font-bold">
             {VOTE_OPTIONS.map((option) => {
               const Icon = ICONS[option.icon as keyof typeof ICONS];
-              const isSelected = selectedOption === option.id; // Изменено: проверяем, совпадает ли ID
+              const isSelected = selectedOption === option.id;
 
               return (
                   <div
@@ -79,7 +79,7 @@ export default function VotePage() {
                       className={`relative p-6 gap-4 h-max flex flex-row items-center cursor-pointer transition-all ${
                           isSelected ? 'scale-105 ring-2 ring-primary rounded-lg' : ''
                       }`}
-                      onClick={() => handleOptionClick(option.id)} // Изменено: вызываем новую функцию
+                      onClick={() => handleOptionClick(option.id)}
                   >
                     <img
                         src={Icon}
@@ -95,7 +95,7 @@ export default function VotePage() {
           <Button
               className="w-full max-w-md mx-auto block bg-primary"
               onClick={() => mutation.mutate()}
-              disabled={mutation.isPending || selectedOption === null} // Изменено: проверяем, выбран ли вариант
+              disabled={mutation.isPending || selectedOption === null}
           >
             {mutation.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
