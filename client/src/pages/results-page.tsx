@@ -145,7 +145,7 @@ export default function ResultsPage() {
                                 minWidth: '120px',
                             }}
                         >
-                            <div className="text-2xl font-medium text-primary"
+                            <div className="text-2xl font-medium text-[#803226]"
                                  style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.2)" }}
                             >
                                 {cloud.username}
