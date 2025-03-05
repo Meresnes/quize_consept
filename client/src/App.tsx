@@ -10,6 +10,7 @@ import VotePage from "@/pages/vote-page";
 import ResultsPage from "@/pages/results-page";
 import AdminPage from "@/pages/admin-page";
 import ThankYouPage from "@/pages/thank-you-page";
+import RoulettePage from "@/pages/roulette-page.tsx";
 
 
 const GlobalStyles = () => (
@@ -43,6 +44,7 @@ function Router() {
       <Route path="/vote/:id" component={VotePage} />
         <Route path="/thank-you" component={ThankYouPage} />
       <Route path="/results" component={ResultsPage} />
+      <Route path="/roulette" component={RoulettePage} />
       <Route path="/admin" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>
