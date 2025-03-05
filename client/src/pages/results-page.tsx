@@ -29,11 +29,11 @@ type Cloud = {
 };
 
 const VOTE_SHORT_TEXT = [
-    { id: 1, name: "ХАСИДСКИЙ НИГУН" },
-    { id: 2, name: "БЛАГОДАРНОСТЬ" },
-    { id: 3, name: "ТЕИЛИМ" },
-    { id: 4, name: "ЗАПОВЕДИ ПУРИМА" },
-    { id: 5, name: "ШАББАТ" },
+    { id: 1, name: "БЛАГОДАРНОСТЬ" },
+    { id: 2, name: "ТЕИЛИМ" },
+    { id: 3, name: "ЗАПОВЕДИ ПУРИМА" },
+    { id: 4, name: "ШАББАТ" },
+    { id: 5, name: "ХАСИДСКИЙ НИГУН" },
 ];
 
 export default function ResultsPage() {
@@ -64,8 +64,8 @@ export default function ResultsPage() {
                 setClouds(prev => [...prev, {
                     id: cloudId,
                     username: voter.fullName,
-                    x: Math.random() * 80 + 5, // Фиксируем x
-                    y: Math.random() * 60 + 20, // Фиксируем y
+                    x: Math.random() * 80 + 5,
+                    y: Math.random() * 60 + 20,
                     voteId
                 }]);
 
@@ -116,11 +116,11 @@ export default function ResultsPage() {
                                         marginBottom: `${scale * 52}px`,
                                     }}
                                 />
-                                <p className="mt-4 font-bold text-lg md:text-xl lg:text-lg text-pretty">
+                                <p className="mt-4 font-bold text-3xl text-pretty text-red-900">
                                     {VOTE_SHORT_TEXT[option.id - 1].name}
                                 </p>
                                 <p
-                                    className="mt-2 text-sm md:text-base text-primary text-red-900"
+                                    className="mt-2 text-xl text-black"
                                     style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)" }}
                                 >
                                     Голосов: {count}
@@ -134,8 +134,8 @@ export default function ResultsPage() {
                             key={cloud.id}
                             className="absolute animate-fly flex justify-center items-center border border-gray-200"
                             style={{
-                                left: `${cloud.x}%`, // Фиксированная позиция X
-                                top: `${cloud.y}%`, // Фиксированная позиция Y
+                                left: `${cloud.x}%`,
+                                top: `${cloud.y}%`,
                                 transform: 'translateX(-50%)',
                                 background: 'rgba(255, 255, 255, 0.9)',
                                 padding: '12px 24px',
@@ -145,7 +145,9 @@ export default function ResultsPage() {
                                 minWidth: '120px',
                             }}
                         >
-                            <div className="text-lg font-medium text-primary">
+                            <div className="text-2xl font-medium text-primary"
+                                 style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.2)" }}
+                            >
                                 {cloud.username}
                             </div>
                         </div>
