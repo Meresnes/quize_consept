@@ -102,6 +102,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/clear", async (req, res) => {
+    try {
+      // const { password } = req.body;
+      //
+      // // if (password !== CLEAR_PASSWORD) {
+      // //   return res.status(401).json({ error: "Неверный пароль" });
+      // // }
+
+      await storage.clearAllUsers();
+      await storage.clearAllVotes();
+      await broadcastVoteCounts()
+
+      res.status(200).json({ message: "Все пользователи и голоса успешно удалены" });
+    } catch (error) {
+      console.error("Ошибка при очистке данных:", error);
+      res.status(500).json({ error: "Ошибка сервера при очистке данных" });
+    }
+  });
+
   app.get("/api/votes", async (_req, res) => {
     const counts = await storage.getVoteCount();
     res.json(counts);

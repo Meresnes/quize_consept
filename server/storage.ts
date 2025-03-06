@@ -146,6 +146,24 @@ export class SQLiteStorage implements IStorage {
       throw error;
     }
   }
+
+  async clearAllUsers(): Promise<void> {
+    try {
+      db.prepare("DELETE FROM users").run();
+    } catch (error) {
+      console.error("Error clearing users:", error);
+      throw error;
+    }
+  }
+
+  async clearAllVotes(): Promise<void> {
+    try {
+      db.prepare("DELETE FROM votes").run();
+    } catch (error) {
+      console.error("Error clearing votes:", error);
+      throw error;
+    }
+  }
 }
 
 export const storage = new SQLiteStorage();
