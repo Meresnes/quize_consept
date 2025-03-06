@@ -7,10 +7,10 @@ import { VOTE_OPTIONS } from "@shared/schema";
 import { useLocation, useParams } from "wouter";
 import { Loader2 } from "lucide-react";
 import Drum from '../../public/assets/Drum.png';
-import Guitar from '../../public/assets/Guitar.png';
-import Music4 from '../../public/assets/Violin.png';
-import Music2 from '../../public/assets/Piano.png';
-import Music3 from '../../public/assets/Saxaphone.png';
+import Guitar from '../../public/assets/GuitarMini.png';
+import Music4 from '../../public/assets/ViolinMini.png';
+import Music2 from '../../public/assets/PianoMini.png';
+import Music3 from '../../public/assets/SaxaphoneMini.png';
 import { useState } from "react";
 import {VOTE_SHORT_TEXT} from "@/pages/results-page";
 
@@ -100,7 +100,7 @@ export default function VotePage() {
                     <div className="flex flex-row items-center gap-4">
                       <img
                           src={Icon}
-                          className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-lg"
+                          className="ml-[-10px] w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-lg"
                       />
 
                       <h2 className="mt-4 text-lg md:text-xl no-hyphens text-left ">
