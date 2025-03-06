@@ -39,6 +39,13 @@ export default function RegisterPage() {
         mutationFn: async (data: InsertUser) => {
             console.log("Отправляемые данные:", data); // Для отладки
             const res = await apiRequest("POST", "/api/register", data);
+            if (!res.ok) {
+                const errorData = await res.json();
+                if (res.status === 409) {
+                    throw new Error(errorData.message || "Пользователь с таким номером телефона уже зарегистрирован.");
+                }
+                throw new Error(errorData.message || "Произошла ошибка при регистрации.");
+            }
             return res.json();
         },
         onSuccess: (data) => {

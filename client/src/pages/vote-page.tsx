@@ -12,6 +12,7 @@ import Music4 from '../../public/assets/Violin.png';
 import Music2 from '../../public/assets/Piano.png';
 import Music3 from '../../public/assets/Saxaphone.png';
 import { useState } from "react";
+import {VOTE_SHORT_TEXT} from "@/pages/results-page";
 
 const ICONS = {
   Music4,
@@ -81,26 +82,31 @@ export default function VotePage() {
           </div>
 
           <div className="grid md:grid-rows-3 lg:grid-rows-4 gap-8 font-bold">
-            {VOTE_OPTIONS.map((option) => {
+            {VOTE_OPTIONS.map((option, index) => {
               const Icon = ICONS[option.icon as keyof typeof ICONS];
               const isSelected = selectedOption === option.id;
 
               return (
                   <div
                       key={option.id}
-                      className={`relative p-6 gap-4 h-max flex flex-row items-center cursor-pointer transition-all ${
+                      className={`relative p-6 h-max flex flex-col items-center cursor-pointer transition-all ${
                           isSelected ? 'scale-105 ring-2 ring-primary rounded-lg' : ''
                       }`}
                       onClick={() => handleOptionClick(option.id)}
                   >
-                    <img
-                        src={Icon}
-                        className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-lg"
-                    />
+                    <h3 className="text-red-700">
+                      {VOTE_SHORT_TEXT[index].name}
+                    </h3>
+                    <div className="flex flex-row items-center gap-4">
+                      <img
+                          src={Icon}
+                          className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-lg"
+                      />
 
-                    <h2 className="mt-4 text-lg md:text-xl no-hyphens text-left text-red-700">
-                      {renderNameWithNoWrap(option.name)}
-                    </h2>
+                      <h2 className="mt-4 text-lg md:text-xl no-hyphens text-left ">
+                        {renderNameWithNoWrap(option.name)}
+                      </h2>
+                    </div>
                   </div>
               );
             })}

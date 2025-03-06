@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
-import { insertUserSchema, insertVoteSchema } from "@shared/schema";
+import {insertUserSchema, insertVoteSchema, User} from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
 import {STATUS} from "@/types/status";
@@ -28,6 +28,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Регистрация закрыта" });
       }
       const userData = insertUserSchema.parse(req.body);
+
+      const existingUser = await storage.getAllUsers()
+          .then((users: User[])  => {
+            return users.some((user: User) => user.phone === userData.phone && user.hasVoted);
+          })
+      if (existingUser) {
+        return res.status(409).json({ message: "Пользователь с таким номером телефона уже зарегистрирован." });
+      }
+
       const user = await storage.createUser(userData);
       res.status(201).json(user);
     } catch (error) {
