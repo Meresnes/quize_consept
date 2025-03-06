@@ -55,6 +55,18 @@ export default function VotePage() {
     setSelectedOption(optionId);
   };
 
+  const renderNameWithNoWrap = (name: string) => {
+    const parts = name.split(" ");
+    // @ts-ignore
+    return parts.map((part, index) => (
+        part.includes("-") ? (
+            <span key={index} className="whitespace-nowrap">{part}</span>
+        ) : (
+            <span key={index}>{part}</span>
+        )
+    )).reduce((prev, curr) => [prev, " ", curr]);
+  };
+
   return (
       <div className="min-h-screen bg-gradient-to-br from-primary/2 via-primary/5 to-primary/2  "
            style={{
@@ -86,7 +98,9 @@ export default function VotePage() {
                         className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-lg"
                     />
 
-                    <h2 className="mt-4 text-lg md:text-xl text-left">{option.name}</h2>
+                    <h2 className="mt-4 text-lg md:text-xl no-hyphens text-left text-red-700">
+                      {renderNameWithNoWrap(option.name)}
+                    </h2>
                   </div>
               );
             })}
