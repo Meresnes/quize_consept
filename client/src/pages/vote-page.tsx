@@ -64,7 +64,7 @@ export default function VotePage() {
         <div className="max-w-6xl mx-auto space-y-8 py-8 m-4 p-8">
           <div className="text-center space-y-4 flex items-center justify-center flex-col">
             <Logo />
-            <h1 className="text-3xl font-bold">Выберите хорошее решение</h1>
+            <h1 className="text-3xl text-red-700 font-bold">Выберите хорошее решение</h1>
             <p className="text-muted-foreground">Вы можете выбрать только один вариант</p>
           </div>
 
