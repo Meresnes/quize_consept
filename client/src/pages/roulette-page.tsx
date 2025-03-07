@@ -98,7 +98,7 @@ export default function RoulettePage() {
 
     return (
         <div
-            className="min-h-screen h-screen flex flex-col justify-center items-center relative p-20 overflow-hidden"
+            className="min-h-screen h-screen flex flex-col justify-center items-center relative pt-20 px-20 overflow-hidden"
             style={{
                 background: "linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7))",
             }}
@@ -145,7 +145,7 @@ export default function RoulettePage() {
                                     <p className="ml-4 text-3xl text-primary">Загрузка пользователей...</p>
                                 </div>
                             ) : (
-                                <div className="flex flex-col mb-6 h-full">
+                                <div className="flex flex-col mb-6 h-full justify-center">
                                     {!isSpinning && !showWinner && !winner && (
                                         <div className="grid grid-cols-3 gap-4 h-full items-center overflow-auto px-4">
                                             {voteCounts[option.id]?.voters.map((voter) => (
@@ -164,40 +164,43 @@ export default function RoulettePage() {
                                     )}
 
                                     {isSpinning && (
-                                        <div className="mt-6 relative max-h-full m-10">
+                                        <div className="max-h-full mx-10 overflow-hidden flex flex-col items-center justify-center">
                                             <img
                                                 src={ICONS[VOTE_OPTIONS.find(opt => opt.id === option.id)?.icon as keyof typeof ICONS]}
-                                                className="mx-auto object-contain animate-spin"
-                                                style={{ maxHeight: "350px" }}
+                                                className="mx-auto object-contain lg:h-80 w-auto sm:h-[80px] animate-spin h-auto max-w-full"
                                             />
-                                            <p className="my-2 text-5xl text-[#803226]">Выбираем победителя...</p>
+                                            <p className="my-2 text-4xl text-[#803226]">Выбираем победителя...</p>
                                         </div>
                                     )}
 
-                                    <div className="p-10">
-                                        {!isSpinning && !showWinner && !winner && (
-                                            <button
-                                                onClick={() => selectWinner(option.id)}
-                                                disabled={isSpinning || !voteCounts[option.id]?.voters?.length}
-                                                className="px-6 py-3 bg-primary text-black rounded-lg hover:bg-amber-100 text-3xl disabled:bg-gray-400 transition-all w-full"
-                                            >
-                                                Выбрать победителя
-                                            </button>
-                                        )}
+                                    {!isSpinning && (
+                                            <div className="p-10">
+                                                { !showWinner && !winner && (
+                                                    <button
+                                                        onClick={() => selectWinner(option.id)}
+                                                        disabled={isSpinning || !voteCounts[option.id]?.voters?.length}
+                                                        className="px-6 py-3 bg-primary text-black rounded-lg hover:bg-amber-100 text-3xl disabled:bg-gray-400 transition-all w-full"
+                                                    >
+                                                        Выбрать победителя
+                                                    </button>
+                                                )}
 
-                                        {showWinner && winner && (
-                                            <div className="mt-6 relative max-h-full overflow-hidden">
-                                                <div className="p-6 rounded-lg shadow-lg border border-primary">
-                                                    <h2 className="text-5xl font-bold text-red-700">
-                                                        Победитель: {winner.fullName}
-                                                    </h2>
-                                                    <p className="mt-4 text-3xl text-[#803226]">
-                                                        Номер телефона: {winner.phone[0] === '+' ? winner.phone : `+${winner.phone}`}
-                                                    </p>
-                                                </div>
+                                                {showWinner && winner && (
+                                                    <div className="mt-6 relative max-h-full overflow-hidden">
+                                                        <div className="p-6 rounded-lg shadow-lg border border-primary">
+                                                            <h2 className="text-5xl font-bold text-red-700">
+                                                                Победитель: {winner.fullName}
+                                                            </h2>
+                                                            <p className="mt-4 text-3xl text-[#803226]">
+                                                                Номер телефона: {winner.phone[0] === '+' ? winner.phone : `+${winner.phone}`}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
+                                        )
+                                    }
+
                                 </div>
                             )}
                         </TabsContent>
