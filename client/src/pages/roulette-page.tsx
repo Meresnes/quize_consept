@@ -5,6 +5,10 @@ import Guitar from '../../public/assets/Guitar.png';
 import Music4 from '../../public/assets/Violin.png';
 import Music2 from '../../public/assets/Piano.png';
 import Music3 from '../../public/assets/Saxaphone.png';
+import Note1 from '../../public/assets/Note1.svg';
+import Note2 from '../../public/assets/Note2.svg';
+import Note3 from '../../public/assets/Note3.svg';
+
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 import { VOTE_SHORT_TEXT } from "@/pages/results-page";
 import { VoteCountWithUsers } from "../../../server/storage.ts";
@@ -79,9 +83,9 @@ export default function RoulettePage() {
     };
 
     const notes = [
-        'url("../public/assets/Note1.svg")',
-        'url("../public/assets/Note2.svg")',
-        'url("../public/assets/Note3.svg")',
+        `url(${Note1})`,
+        `url(${Note2})`,
+        `url(${Note3})`,
     ];
 
     if (error) {
