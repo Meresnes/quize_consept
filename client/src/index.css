@@ -110,4 +110,30 @@
       opacity: 0; /* Исчезновение в конце */
     }
   }
+
+  /* Scrollbar customization */
+  ::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+    height: 8px; /* Height for horizontal scrollbar */
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--primary)); /* Track color using your muted variable */
+    border-radius: 4px; /* Rounded edges for the track */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary)); /* Thumb color using your primary variable */
+    border-radius: 4px; /* Rounded edges for the thumb */
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--ring)); /* Hover color using your ring variable */
+  }
+
+  /* Firefox fallback */
+  * {
+    scrollbar-width: thin; /* Thin scrollbar */
+    scrollbar-color: hsl(var(--primary)) hsl(var(--muted)); /* Thumb and track colors */
+  }
 }

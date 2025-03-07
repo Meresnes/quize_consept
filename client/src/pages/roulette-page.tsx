@@ -7,7 +7,7 @@ import Music2 from '../../public/assets/Piano.png';
 import Music3 from '../../public/assets/Saxaphone.png';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 import { VOTE_SHORT_TEXT } from "@/pages/results-page";
-import {VoteCountWithUsers} from "../../../server/storage.ts";
+import { VoteCountWithUsers } from "../../../server/storage.ts";
 
 const ICONS = {
     Music4,
@@ -86,7 +86,7 @@ export default function RoulettePage() {
 
     if (error) {
         return (
-            <div className="min-h-screen h-screen flex justify-center items-center relative text-primary">
+            <div className="min-h-screen flex justify-center items-center relative text-primary">
                 <p>Произошла ошибка: {error.message}</p>
             </div>
         );
@@ -94,12 +94,12 @@ export default function RoulettePage() {
 
     return (
         <div
-            className="min-h-screen h-screen flex flex-col justify-center items-center relative p-20"
+            className="min-h-screen h-screen flex flex-col justify-center items-center relative p-20 overflow-hidden"
             style={{
                 background: "linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7))",
             }}
         >
-            <Tabs value={currentVoteId.toString()} onValueChange={onValueChange} className="h-full flex flex-col w-full">
+            <Tabs value={currentVoteId.toString()} onValueChange={onValueChange} className="h-full flex flex-col max-w-7xl">
                 <TabsList className="flex justify-center gap-8 mb-8 w-full">
                     {VOTE_SHORT_TEXT.map((option) => {
                         const voteOption = VOTE_OPTIONS.find(opt => opt.id === option.id);
@@ -110,14 +110,16 @@ export default function RoulettePage() {
                                 key={option.id}
                                 value={option.id.toString()}
                                 disabled={isSpinning}
-                                className="flex flex-col items-center px-4 py-2 text-3xl font-bold rounded-lg bg-primary/5 text-red-700 data-[state=active]:bg-primary data-[state=active]:text-black transition-all"
+                                className={`flex flex-col items-center justify-end px-4 py-2 text-2xl font-bold rounded-lg bg-primary/5 
+                                text-red-700 data-[state=active]:bg-primary transition-all
+                                ${currentVoteId === option.id ? 'scale-110' : ''}`}
                             >
                                 {Icon && (
                                     <img
                                         src={Icon}
                                         alt={option.name}
                                         className="object-contain mb-2"
-                                        style={{ maxHeight: "380px" }}
+                                        style={{ maxHeight: "150px" }}
                                     />
                                 )}
                                 <span>{option.name}</span>
@@ -131,7 +133,7 @@ export default function RoulettePage() {
                         <TabsContent
                             key={option.id}
                             value={option.id.toString()}
-                            className="text-center flex-1 flex flex-col"
+                            className="text-center flex-1 flex h-full gap-12 flex-col overflow-hidden"
                         >
                             {isLoading ? (
                                 <div className="flex justify-center items-center h-full flex-1">
@@ -139,66 +141,61 @@ export default function RoulettePage() {
                                     <p className="ml-4 text-3xl text-primary">Загрузка пользователей...</p>
                                 </div>
                             ) : (
-                                <div className="flex-1 mb-6 relative">
-                                    <div className="grid grid-cols-3 gap-4 max-h-[400px] overflow-y-auto px-4">
-                                        {!isSpinning && (
-                                            <>
-                                                {voteCounts[option.id]?.voters.map((voter) => (
-                                                        <div
-                                                            key={voter.id}
-                                                            className="py-2 text-2xl text-[#803226] border-b border-gray-200"
-                                                        >
-                                                            {voter.fullName}
-                                                        </div>
-                                                    )) || (
-                                                        <p className="text-2xl text-muted-foreground col-span-3">
-                                                            Никто ещё не проголосовал
-                                                        </p>
-                                                    )}
-                                            </>
-                                        )}
+                                <div className="flex flex-col mb-6 h-full">
+                                    {!isSpinning && !showWinner && !winner && (
+                                        <div className="grid grid-cols-3 gap-4 h-full items-center overflow-auto px-4">
+                                            {voteCounts[option.id]?.voters.map((voter) => (
+                                                <div
+                                                    key={voter.id}
+                                                    className="py-2 text-2xl text-[#803226] border-b border-gray-200"
+                                                >
+                                                    {voter.fullName}
+                                                </div>
+                                            )) || (
+                                                <p className="text-2xl text-muted-foreground col-span-3">
+                                                    Никто ещё не проголосовал
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
 
-
-                                    </div>
                                     {isSpinning && (
-                                        <div className="mt-6 relative max-h-[550px] m-10 overflow-hidden">
+                                        <div className="mt-6 relative max-h-full m-10">
                                             <img
                                                 src={ICONS[VOTE_OPTIONS.find(opt => opt.id === option.id)?.icon as keyof typeof ICONS]}
                                                 className="mx-auto object-contain animate-spin"
-                                                style={{ maxHeight: "450px" }}
+                                                style={{ maxHeight: "350px" }}
                                             />
                                             <p className="my-2 text-5xl text-[#803226]">Выбираем победителя...</p>
                                         </div>
                                     )}
+
+                                    <div className="p-10">
+                                        {!isSpinning && !showWinner && !winner && (
+                                            <button
+                                                onClick={() => selectWinner(option.id)}
+                                                disabled={isSpinning || !voteCounts[option.id]?.voters?.length}
+                                                className="px-6 py-3 bg-primary text-black rounded-lg hover:bg-amber-100 text-3xl disabled:bg-gray-400 transition-all w-full"
+                                            >
+                                                Выбрать победителя
+                                            </button>
+                                        )}
+
+                                        {showWinner && winner && (
+                                            <div className="mt-6 relative max-h-full overflow-hidden">
+                                                <div className="p-6 rounded-lg shadow-lg border border-primary">
+                                                    <h2 className="text-5xl font-bold text-red-700">
+                                                        Победитель: {winner.fullName}
+                                                    </h2>
+                                                    <p className="mt-4 text-3xl text-[#803226]">
+                                                        Номер телефона: {winner.phone[0] === '+' ? winner.phone : `+${winner.phone}`}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             )}
-
-                            <div className="mt-auto p-4">
-                                {!isSpinning && (
-                                    <button
-                                        onClick={() => selectWinner(option.id)}
-                                        disabled={isSpinning || !voteCounts[option.id]?.voters?.length}
-                                        className="px-6 py-3 bg-primary text-black rounded-lg hover:bg-amber-100 text-3xl disabled:bg-gray-400 transition-all w-full"
-                                    >
-                                        Выбрать победителя
-                                    </button>
-                                )}
-
-
-
-                                {showWinner && winner && (
-                                    <div className="mt-6 relative max-h-[400px] overflow-hidden">
-                                        <div className="p-6 bg-white rounded-lg shadow-lg border border-primary">
-                                            <h2 className="text-5xl font-bold text-red-700">
-                                                Победитель: {winner.fullName}
-                                            </h2>
-                                            <p className="mt-4 text-3xl text-[#803226]">
-                                                Номер телефона: {winner.phone[0] === '+' ? winner.phone : `+${winner.phone}` }
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
                         </TabsContent>
                     )
                 ))}
