@@ -31,6 +31,24 @@ export default defineConfig({
   root: path.resolve(__dirname, "client"),
   build: {
     outDir: path.resolve(__dirname, "dist/public"),
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: [
+              'react',
+              'react-dom',
+              '@tanstack/react-query',
+              'framer-motion',
+              'lucide-react',
+              'recharts',
+              'zod',
+              'tailwind-merge',
+              'react-hook-form',
+              '@hookform/resolvers'
+          ]
+        },
+      },
+    },
     emptyOutDir: true,
   },
 });
