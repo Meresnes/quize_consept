@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { VOTE_OPTIONS } from "@shared/schema";
+import { VOTE_OPTIONS, type User } from "@shared/schema";
 import { useWebSocket } from "@/hooks/use-websocket";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -27,10 +27,19 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import * as XLSX from "xlsx";
+import { VoteCountWithUsers } from "../../../server/storage";
+import {VOTE_SHORT_TEXT} from "@/pages/results-page.tsx";
 
 export default function AdminPage() {
   const { data: users } = useQuery({
     queryKey: ["/api/users"],
+  });
+  const { data: voteCountsData, isLoading, isError } = useQuery({
+    queryKey: ["/api/votes"],
+    queryFn: async () => {
+      const res = await apiRequest("GET", "/api/votes");
+      return await res.json() as VoteCountWithUsers;
+    },
   });
   const queryClient = useQueryClient();
   const [appStatus, setAppStatus] = useState<string>(STATUS.CLOSED);
@@ -41,7 +50,6 @@ export default function AdminPage() {
     queryKey: ["/api/registration-status"],
     queryFn: async () => {
       const res = await apiRequest("GET", "/api/registration-status");
-
       const data = await res.json();
       return data.status;
     },
@@ -58,7 +66,6 @@ export default function AdminPage() {
         title: "Пользователи и голоса были очищены",
         description: data.message,
       });
-
       await queryClient.invalidateQueries({ queryKey: ["/api/users"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/votes"] });
     },
@@ -92,6 +99,7 @@ export default function AdminPage() {
       });
     },
   });
+
   useEffect(() => {
     if (initialStatus) {
       setAppStatus(initialStatus);
@@ -117,7 +125,7 @@ export default function AdminPage() {
 
     const formattedUsers = users.map((user) => ({
       Имя: user.fullName,
-      Телефон: user.phone.toString()[0] === '+' ? user.phone : `+${user.phone}`,
+      Телефон: user.phone.toString()[0] === "+" ? user.phone : `+${user.phone}`,
       // Проголосовал: user.hasVoted ? "Да" : "Нет",
     }));
 
@@ -127,37 +135,77 @@ export default function AdminPage() {
     XLSX.writeFile(workbook, "users.xlsx");
   };
 
+  const exportVotingResultsToExcel = () => {
+    if (!voteCountsData) return;
+
+    const maxVoters = Math.max(
+        ...VOTE_OPTIONS.map((option) => voteCountsData[option.id]?.voters.length || 0)
+    );
+    const headers = VOTE_OPTIONS.map((option) => VOTE_SHORT_TEXT[option.id - 1].name);
+    const data = Array.from({ length: maxVoters }, () => Array(VOTE_OPTIONS.length).fill(""));
+
+    VOTE_OPTIONS.forEach((option, colIndex) => {
+      const voters = voteCountsData[option.id]?.voters || [];
+      voters.forEach((voter, rowIndex) => {
+        if (rowIndex < maxVoters) {
+          data[rowIndex][colIndex] = `${voter.fullName}\n ${voter.phone.toString()[0] === "+" ? voter.phone : `+${voter.phone}`}`;
+        }
+      });
+    });
+
+    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data]);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Результаты голосования");
+    XLSX.writeFile(workbook, "voting_results.xlsx");
+  };
+
+  const renderVotersTable = (voteId: number) => {
+    if (!voteCountsData || !voteCountsData[voteId]) {
+      return <p className="text-muted-foreground">Нет проголосовавших</p>;
+    }
+
+    return (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Имя</TableHead>
+              <TableHead>Телефон</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {voteCountsData[voteId].voters.map((voter: User) => (
+                <TableRow key={voter.id}>
+                  <TableCell>{voter.fullName}</TableCell>
+                  <TableCell>
+                    {voter.phone.toString()[0] === "+" ? voter.phone : `+${voter.phone}`}
+                  </TableCell>
+                </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+    );
+  };
+
   return (
       <div className="min-h-screen p-4 bg-gradient-to-br from-primary/5 to-primary/10">
         <div className="max-w-6xl mx-auto space-y-8 py-8">
           <h1 className="text-3xl font-bold">Админ панель</h1>
           <Card>
             <CardHeader>
-              <CardTitle>
-                Включение\выключение возможности регистрации
-              </CardTitle>
+              <CardTitle>Включение\выключение возможности регистрации</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center space-y-4">
                 <div className={`flex items-center justify-center`}>
                 <span
                     className={`mr-4 font-bold ${
-                        appStatus === STATUS.OPEN
-                            ? "text-green-500"
-                            : "text-red-500"
+                        appStatus === STATUS.OPEN ? "text-green-500" : "text-red-500"
                     }`}
                 >
-                  Статус регистрации:{" "}
-                  {appStatus === STATUS.OPEN ? "Открыт" : "Закрыт"}
+                  Статус регистрации: {appStatus === STATUS.OPEN ? "Открыт" : "Закрыт"}
                 </span>
-                  <Button
-                      onClick={toggleAppStatus}
-                      className="bg-primary "
-                      variant="outline"
-                  >
-                    {appStatus === STATUS.OPEN
-                        ? "Закрыть доступ"
-                        : "Открыть доступ"}
+                  <Button onClick={toggleAppStatus} className="bg-primary" variant="outline">
+                    {appStatus === STATUS.OPEN ? "Закрыть доступ" : "Открыть доступ"}
                   </Button>
                 </div>
               </div>
@@ -171,19 +219,11 @@ export default function AdminPage() {
               <div className="text-center space-y-4">
                 <div className={`flex items-center justify-center`}>
                 <span className="mr-4 font-bold">
-                  {" "}
                   Очистить пользователей и результаты голосования
                 </span>
-                  <AlertDialog
-                      open={isClearModalOpen}
-                      onOpenChange={setIsClearModalOpen}
-                  >
+                  <AlertDialog open={isClearModalOpen} onOpenChange={setIsClearModalOpen}>
                     <AlertDialogTrigger asChild>
-                      <Button
-                          onClick={handleOpenClearModal}
-                          className="bg-red-600"
-                          variant="outline"
-                      >
+                      <Button onClick={handleOpenClearModal} className="bg-red-600" variant="outline">
                         Очистить
                       </Button>
                     </AlertDialogTrigger>
@@ -191,8 +231,7 @@ export default function AdminPage() {
                       <AlertDialogHeader>
                         <AlertDialogTitle>Вы уверены?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Это действие безвозвратно удалит всех пользователей и
-                          их голоса.
+                          Это действие безвозвратно удалит всех пользователей и их голоса.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
@@ -220,19 +259,26 @@ export default function AdminPage() {
               <CardTitle>Результаты голосования</CardTitle>
             </CardHeader>
             <CardContent>
+              <div className="flex justify-end mb-4">
+                <Button
+                    onClick={exportVotingResultsToExcel}
+                    disabled={isLoading || isError}
+                    className="bg-primary"
+                >
+                  Экспорт в Excel
+                </Button>
+              </div>
               <div className="grid gap-4 md:grid-cols-3">
                 {VOTE_OPTIONS.map((option) => (
                     <div key={option.id} className="p-4 border rounded-lg">
                       <h3 className="font-semibold">{option.name}</h3>
-                      <p className="text-2xl font-bold">
-                        {voteCounts[option.id]?.count || 0}
-                      </p>
+                      <p className="text-2xl font-bold">{voteCounts[option.id]?.count || 0}</p>
+                      <div className="mt-4">{renderVotersTable(option.id)}</div>
                     </div>
                 ))}
               </div>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader>
               <CardTitle>Зарегистрированные пользователи</CardTitle>
@@ -254,8 +300,9 @@ export default function AdminPage() {
                   {users?.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell>{user.fullName}</TableCell>
-                        <TableCell>{user.phone.toString()[0] === '+' ? user.phone : `+${user.phone}`}</TableCell>
-                        {/*<TableCell>{user.hasVoted ? "Да" : "Нет"}</TableCell>*/}
+                        <TableCell>
+                          {user.phone.toString()[0] === "+" ? user.phone : `+${user.phone}`}
+                        </TableCell>
                       </TableRow>
                   ))}
                 </TableBody>
